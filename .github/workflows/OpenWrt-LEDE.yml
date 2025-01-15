@@ -172,15 +172,6 @@ jobs:
         name: OpenWrt-${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
 
-    - name: 删除旧版固件
-      uses: dev-drprasad/delete-older-releases@master
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 0
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     - name: 创建发布标签
       id: tag
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
@@ -190,7 +181,6 @@ jobs:
         echo "管理地址：10.0.0.253" >> release.txt
         echo "默认密码：无" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
-        
 
     - name: 发布新版固件
       uses: softprops/action-gh-release@v2
@@ -202,6 +192,15 @@ jobs:
         tag_name: ${{ steps.tag.outputs.release_tag }}
         body_path: release.txt
         files: ${{ env.FIRMWARE }}/* 
+
+    - name: 删除旧版固件
+      uses: dev-drprasad/delete-older-releases@master
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        keep_latest: 0
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: 清理编译流程
       uses: Mattraks/delete-workflow-runs@main
